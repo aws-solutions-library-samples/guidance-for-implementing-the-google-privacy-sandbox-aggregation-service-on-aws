@@ -1,0 +1,23 @@
+{
+    "classification": "confidential",
+    "kds_retention_hours": 24,
+    "stream_batch_window_size": "100 seconds",
+    
+    "glue_database_name": "aggregation_server",
+    "project_name": "aws-gps-aggregation-server",
+
+    "aggregate_raw_job_name": "job-aggregate-raw",
+    "aggregate_avro_job_name": "job-aggregate-avro",
+
+    "raw_data_bucket_name": "your-s3-bucket-name",
+    "avro_data_bucket_name": "your-s3-bucket-name",
+
+    "raw_job_script": "job-aggregate-raw.py",
+    "avro_job_script": "job-aggregate-avro.py",
+
+    "glue_table_agg_raw": "aggregation_report_raw",
+    "glue_table_agg_avro": "aggregation_report_avro",
+
+    "collector_ecr_repo_name": "collector-api",
+    "privacy_sandbox_aggregation_service_api": "<REPLACE WITH API GATEWAY URI FOR YOUR AGGREGATION SERVICE"
+}

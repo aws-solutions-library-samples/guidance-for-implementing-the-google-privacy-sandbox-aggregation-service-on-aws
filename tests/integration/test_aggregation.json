@@ -1,0 +1,15 @@
+{
+    "shared_info": "{\"api\":\"attribution-reporting\",\"attribution_destination\":\"https://advertiser.example\",\"report_id\":\"12345678-1234-5678-1234-567812345678\",\"reporting_origin\":\"https://reporter.example\",\"scheduled_report_time\":\"1645603200\",\"source_registration_time\":\"1645603200\",\"version\":\"1.0\"}",
+    "aggregation_service_payloads": [
+      {
+        "payload": "aGVsbG8gd29ybGQ=",
+        "key_id": "public_key_1",
+        "debug_cleartext_payload": "hello world"
+      }
+    ],
+    "aggregation_coordinator_origin": "https://publickeyservice.msmt.aws.privacysandboxservices.com",
+    "source_debug_key": "1234567890",
+    "trigger_debug_key": "9876543210",
+    "trigger_context_id": "example string"
+  }
+  

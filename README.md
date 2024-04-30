@@ -1,213 +1,172 @@
-# Guidance Title (required)
+# Deploing Privacy Sandbox on AWS
 
-The Guidance title should be consistent with the title established first in Alchemy.
+## Table of Content
 
-**Example:** *Guidance for Product Substitutions on AWS*
-
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
-
-
-## Table of Content (required)
-
-List the top-level sections of the README template, along with a hyperlink to the specific section.
-
-### Required
-
-1. [Overview](#overview-required)
+1. [Overview](#overview)
     - [Cost](#cost)
-2. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
+2. [Prerequisites](#prerequisites)
+    - [Operating System](#operating-system)
+3. [Deployment Steps](#deployment-steps)
+4. [Deployment Validation](#deployment-validation)
+5. [Running the Guidance](#running-the-guidance)
+6. [Next Steps](#next-steps)
+7. [Cleanup](#cleanup)
+8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
+9. [Revisions](#revisions)
+10. [Notices](#notices)
+11. [Authors](#authors)
 
-***Optional***
+## Overview
 
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
 
-## Overview (required)
 
-1. Provide a brief overview explaining the what, why, or how of your Guidance. You can answer any one of the following to help you write this:
+### Architecture Overview
+![architecture diagram](./assets/imgs/architecture_diagram.png)
 
-    - **Why did you build this Guidance?**
-    - **What problem does this Guidance solve?**
+### Cost
 
-2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture. 
-    - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README. 
+_You are responsible for the cost of the AWS services used while running this Guidance. As of April 2024, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately xxx per month for processing ( 1 mil records each day )._
+
+## Prerequisites
+
+You must deploy the [Privacy Sandbox Aggregation Service](https://github.com/privacysandbox/aggregation-service/tree/main) on AWS. Instructions to deploy the Aggregation Service can be found [here](https://github.com/privacysandbox/aggregation-service/blob/main/docs/aws-aggregation-service.md).
+
+### Operating System
+
+The project code uses the Python version of the AWS CDK ([Cloud Development Kit](https://aws.amazon.com/cdk/)). To execute the project code, please ensure that you have fulfilled the [AWS CDK Prerequisites for Python](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html). Steps for a macOS machine is captured here.  Deployment in another OS may require additional steps.
+
+1. Install homebrew
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+2. Install Python
+```
+brew install python
+```
+3. Install Git client
+```
+brew install git
+```
+4. Install AWS CLI
+```
+brew install awscli
+```
+5. Create CLI credentials using IAM in AWS console and Configure CLI profiles
+```
+aws configure --profile <profile name>
+```
 
-### Cost ( required )
+### Python Dependencies
+Review [requirements.txt](./requirements.txt) for the python dependencies
 
-This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. If applicable, provide an in-depth cost breakdown table in this section.
+### AWS CDK bootstrap
 
-Start this section with the following boilerplate text:
+The project code requires that the AWS account is [bootstrapped](https://docs.aws.amazon.com/de_de/cdk/latest/guide/bootstrapping.html) in order to allow the deployment of the CDK stack. Bootstrap CDK on the CLI profile you created earlier
+```
+cdk bootstrap --profile <profile name>
+```
 
-_You are responsible for the cost of the AWS services used while running this Guidance. As of <month> <year>, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $<n.nn> per month for processing ( <nnnnn> records )._
+## Deployment Steps
 
-Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
+1. Clone this repository to your development desktop
+```
+git clone **TODO GITHUB URL**
+```
+2. Use [envsetup.sh](./envsetup.sh) to setup virtual environment and install python dependencies
 
-Suggest you keep this boilerplate text:
-_We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
+3. If you are using Visual Studio Code, you may need to update the python interpreter for the project
 
-### Sample Cost Table ( required )
+![Python interpreter config](./assets/imgs/python-interpreter-in-vscode1.png "Python Interpreter config in vscode")
 
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
+4. Create a [cdk.context.json](cdk.context.json) file. A example [cdk.context.json.example](cdk.context.json.example) is available in the repo. Update the privacy_sandbox_aggregation_service_api, this is the API Gateway URI deployed by the Privacy Sandbox Aggregation Service in the prerequesites step.
+```
+{
+     "privacy_sandbox_aggregation_service_api": "<REPLACE WITH API GATEWAY URI FOR YOUR AGGREGATION SERVICE>"
+}
 
-| AWS service  | Dimensions | Cost [USD] |
-| ----------- | ------------ | ------------ |
-| Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
-| Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
+ ```
 
-## Prerequisites (required)
+5. Deploy the [CollectorBuild]('./deployment/collector_build.py') stack.
+```
+    cdk deploy CollectorBuild --profile <profile name>
+```
 
-### Operating System (required)
+6. Navigate to AWS CodeBuild in the console and locate the project created by the previous step. Start the build. Once the build has completed successfully proceed to the next step.
 
-- Talk about the base Operating System (OS) and environment that can be used to run or deploy this Guidance, such as *Mac, Linux, or Windows*. Include all installable packages or modules required for the deployment. 
-- By default, assume Amazon Linux 2/Amazon Linux 2023 AMI as the base environment. All packages that are not available by default in AMI must be listed out.  Include the specific version number of the package or module.
+7.  cdk deploy CollectorService --profile <profile name>
 
-**Example:**
-“These deployment instructions are optimized to best work on **<Amazon Linux 2 AMI>**.  Deployment in another OS may require additional steps.”
+## Deployment Validation
 
-- Include install commands for packages, if applicable.
+* Open CloudFormation console and verify the status of the template with the name starting with stack.
+* If deployment is successful, you should see CollectorBuild and CollectorService in the console.
 
+## Running the Guidance
+1. Navigate to Glue ETL Jobs in the AWS Console and run the following Glue Jobs: job-aggregate-raw, job-aggregate-avro
 
-### Third-party tools (If applicable)
+2. Execute the request tester script by running the following command on your CLI. The script will prompt you for a URL. Provide the URL to the application load balancer deployed by the CollectorService stack.
 
-*List any installable third-party tools required for deployment.*
+```
+python3 ./tests/integration/endpoint_test.py
+```
 
+3. Validate that data is being persisted to S3 by navigating to Amazon Athena in the AWS Console and running the following query:
 
-### AWS account requirements (If applicable)
+```
+SELECT 
+  json_extract(shared_info, '$.api') AS api,
+  json_extract(shared_info, '$.attribution_destination') AS attribution_destination,
+  json_extract(shared_info, '$.report_id') AS report_id,
+  json_extract(shared_info, '$.reporting_origin') AS reporting_origin,
+  json_extract(shared_info, '$.scheduled_report_time') AS scheduled_report_time,
+  json_extract(shared_info, '$.source_registration_time') AS source_registration_time,
+  json_extract(shared_info, '$.version') AS version,
+  t.payload.payload,
+  t.payload.key_id,
+  t.payload.debug_cleartext_payload,
+  aggregation_coordinator_origin,
+  source_debug_key,
+  trigger_context_id,
+  ingest_month,
+  ingest_day,
+  ingest_hour
+FROM aggregation_report_avro
+CROSS JOIN UNNEST(aggregation_service_payloads) AS t (payload)
+```
 
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
+### Expected output
+You should be able to see data in the S3 buckets created while deploying the CollectorService stack.
 
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
+## Next Steps
 
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
+The Collector Service stack is used for demonstration purposes. Modify this to meet your requirements.
 
+## Cleanup
 
-### aws cdk bootstrap (if sample code has aws-cdk)
+When you’re finished experimenting with this solution, clean up your resources by running the command:
 
-<If using aws-cdk, include steps for account bootstrap for new cdk users.>
+```
+cdk destroy --all --profile=<profile name>
+```
 
-**Example blurb:** “This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping....”
+These commands deletes resources deploying through the solution. S3 buckets containing CloudWatch log groups are retained after the stack is deleted.
 
-### Service limits  (if applicable)
 
-<Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
+## FAQ, known issues, additional considerations, and limitations
+- This guidance does not currently implement batching functionality. Example batching functionality will be introduced in the future.
 
-### Supported Regions (if applicable)
+**Known issues**
 
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
 
+**Additional considerations**
+- For any feedback, questions, or suggestions, please use the issues tab under this repo.
 
-## Deployment Steps (required)
+## Revisions
 
-Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
 
-* All steps must be numbered.
-* If the step requires manual actions from the AWS console, include a screenshot if possible.
-* The steps must start with the following command to clone the repo. ```git clone xxxxxxx```
-* If applicable, provide instructions to create the Python virtual environment, and installing the packages using ```requirement.txt```.
-* If applicable, provide instructions to capture the deployed resource ARN or ID using the CLI command (recommended), or console action.
+## Notices
 
- 
-**Example:**
-
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
-
-
-
-## Deployment Validation  (required)
-
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
-
-
-**Examples:**
-
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
-
-
-
-## Running the Guidance (required)
-
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
-
-This section should include:
-
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
-
-
-
-## Next Steps (required)
-
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
-
-
-## Cleanup (required)
-
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
-
-
-
-## FAQ, known issues, additional considerations, and limitations (optional)
-
-
-**Known issues (optional)**
-
-<If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
-
-
-**Additional considerations (if applicable)**
-
-<Include considerations the customer must know while using the Guidance, such as anti-patterns, or billing considerations.>
-
-**Examples:**
-
-- “This Guidance creates a public AWS bucket required for the use-case.”
-- “This Guidance created an Amazon SageMaker notebook that is billed per hour irrespective of usage.”
-- “This Guidance creates unauthenticated public API endpoints.”
-
-
-Provide a link to the *GitHub issues page* for users to provide feedback.
-
-
-**Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
-
-## Revisions (optional)
-
-Document all notable changes to this project.
-
-Consider formatting this section based on Keep a Changelog, and adhering to Semantic Versioning.
-
-## Notices (optional)
-
-Include a legal disclaimer
-
-**Example:**
 *Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
+## Authors
 
-## Authors (optional)
-
-Name of code contributors
+Bryan Furlong & Brian Maguire
