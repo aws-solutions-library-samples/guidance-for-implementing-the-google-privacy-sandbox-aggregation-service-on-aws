@@ -17,7 +17,7 @@
 11. [Authors](#authors)
 
 ## Overview
-
+This solution demonstrates how to deploy the Privacy Sandbox Private Aggregation Service and supporting services for Privacy Sandbox report collection and processing on AWS. The guidance currently does not implement batching functionality required to process reports, but will be updated in the future to support this.
 
 
 ### Architecture Overview
@@ -31,7 +31,7 @@ _You are responsible for the cost of the AWS services used while running this Gu
 
 ## Prerequisites
 
-You must deploy the [Privacy Sandbox Aggregation Service](https://github.com/privacysandbox/aggregation-service/tree/main) on AWS. Instructions to deploy the Aggregation Service can be found [here](https://github.com/privacysandbox/aggregation-service/blob/main/docs/aws-aggregation-service.md).
+Currently deploying the the [Privacy Sandbox Aggregation Service](https://github.com/privacysandbox/aggregation-service/tree/main) on AWS is optional, but recommmended. This step will not be optional after future releases implement batching functionality. Instructions to deploy the Aggregation Service can be found [here](https://github.com/privacysandbox/aggregation-service/blob/main/docs/aws-aggregation-service.md).
 
 ### Operating System
 
@@ -80,10 +80,10 @@ git clone **TODO GITHUB URL**
 
 ![Python interpreter config](./assets/imgs/python-interpreter-in-vscode1.png "Python Interpreter config in vscode")
 
-4. Create a [cdk.context.json](cdk.context.json) file. A example [cdk.context.json.example](cdk.context.json.example) is available in the repo. Update the privacy_sandbox_aggregation_service_api, this is the API Gateway URI deployed by the Privacy Sandbox Aggregation Service in the prerequesites step.
+4. Create a [cdk.context.json](cdk.context.json) file. A example [cdk.context.json.example](cdk.context.json.example) is available in the repo. Update the privacy_sandbox_aggregation_service_api, this is the API Gateway URI deployed by the Privacy Sandbox Aggregation Service in the prerequesites step. Populating this value is optional for the current release.
 ```
 {
-     "privacy_sandbox_aggregation_service_api": "<REPLACE WITH API GATEWAY URI FOR YOUR AGGREGATION SERVICE>"
+     "privacy_sandbox_aggregation_service_api": "(OPTIONAL) <REPLACE WITH API GATEWAY URI FOR YOUR AGGREGATION SERVICE>"
 }
 
  ```
@@ -97,10 +97,13 @@ git clone **TODO GITHUB URL**
 
 7.  cdk deploy CollectorService --profile <profile name>
 
-## Deployment Validation
+8. Navigate to Glue ETL Jobs in the AWS Console and run the following Glue Jobs: job-aggregate-raw, job-aggregate-avro
 
+
+## Deployment Validation
 * Open CloudFormation console and verify the status of the template with the name starting with stack.
 * If deployment is successful, you should see CollectorBuild and CollectorService in the console.
+* The following Glue Jobs are running successfully: job-aggregate-raw, job-aggregate-avro
 
 ## Running the Guidance
 1. Navigate to Glue ETL Jobs in the AWS Console and run the following Glue Jobs: job-aggregate-raw, job-aggregate-avro
