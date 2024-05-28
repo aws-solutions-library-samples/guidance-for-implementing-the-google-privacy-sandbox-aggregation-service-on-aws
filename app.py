@@ -12,28 +12,28 @@ from cdk_nag import AwsSolutionsChecks, NagSuppressions
 
 app = cdk.App()
 project_name = app.node.try_get_context("project_name")
-
-collector_build = CollectorBuild(app, "CollectorBuild")
+guidance_description = "Guidance for deploying Privacy Sandbox Private Aggregation API on AWS (SO9455)"
+collector_build = CollectorBuild(app, "CollectorBuild", description="guidance_description")
 Tags.of(collector_build).add("project", project_name)
 
-kms_key_stack = KMSKeyStack(app, "KMSKeyStack")
+kms_key_stack = KMSKeyStack(app, "KMSKeyStack", description="guidance_description")
 Tags.of(kms_key_stack).add("project", project_name)
 
-s3_collector_destination = S3Stack(app, 'CollectedDataS3Stack')
+s3_collector_destination = S3Stack(app, 'CollectedDataS3Stack', description="guidance_description")
 Tags.of(s3_collector_destination).add("project", project_name)
 
-s3_summary_destination = S3Stack(app, 'AggregationSummaryDataS3Stack')
+s3_summary_destination = S3Stack(app, 'AggregationSummaryDataS3Stack', description="guidance_description")
 Tags.of(s3_summary_destination).add("project", project_name)
 
-kds_stack_aggregatable_report = KinesisDataStreamsStack(app, 'AggregatableGPSAggServiceCollectorKinesisDataStreamsStack',kms_key=kms_key_stack.kms_key,api_name="gps_aggregatable_report")
+kds_stack_aggregatable_report = KinesisDataStreamsStack(app, 'AggregatableGPSAggServiceCollectorKinesisDataStreamsStack',kms_key=kms_key_stack.kms_key,api_name="gps_aggregatable_report", description="guidance_description")
 Tags.of(kds_stack_aggregatable_report).add("project", project_name)
 
 glue_aggregatable_report = GlueStack(app, "GlueToS3Stack",kms_key=kms_key_stack.kms_key,api_name="gps_aggregatable_report",
   source_kinesis_stream=kds_stack_aggregatable_report.kinesis_stream,s3_collector_destination=s3_collector_destination.s3_bucket
-)
+, description="guidance_description")
 Tags.of(glue_aggregatable_report).add("project", project_name)
 
-collector_service = CollectorServiceStack(app, "CollectorService", source_kinesis_stream=kds_stack_aggregatable_report.kinesis_stream.stream_name, kms_key=kms_key_stack.kms_key.key_id)
+collector_service = CollectorServiceStack(app, "CollectorService", source_kinesis_stream=kds_stack_aggregatable_report.kinesis_stream.stream_name, kms_key=kms_key_stack.kms_key.key_id, description="guidance_description")
 collector_service.add_dependency(kms_key_stack)
 collector_service.add_dependency(glue_aggregatable_report)
 collector_service.add_dependency(kds_stack_aggregatable_report)
