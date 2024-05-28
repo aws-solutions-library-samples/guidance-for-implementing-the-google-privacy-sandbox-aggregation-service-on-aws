@@ -25,7 +25,9 @@
 
 ### Cost
 
-_You are responsible for the cost of the AWS services used while running this Guidance. As of April 2024, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately xxx per month for processing ( 1 mil records each day )._
+_You are responsible for the cost of the AWS services used while running this Guidance. As of May 2024, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $2,599 per month for processing ( 30 million records each day )._
+
+
 
 ## Prerequisites
 
