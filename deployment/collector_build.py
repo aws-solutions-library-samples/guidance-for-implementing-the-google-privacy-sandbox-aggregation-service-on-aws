@@ -1,13 +1,13 @@
 import aws_cdk as cdk
 
-from aws_cdk import Stack, aws_iam as iam, aws_s3 as s3, aws_ecr as ecr, aws_codecommit as codecommit, aws_ssm as ssm
+from aws_cdk import Stack, NestedStack,aws_iam as iam, aws_s3 as s3, aws_ecr as ecr, aws_codecommit as codecommit, aws_ssm as ssm
 
 from aws_cdk import aws_codebuild as codebuild
 
 from constructs import Construct
 
 
-class CollectorBuild(Stack):
+class CollectorBuild(NestedStack):
 
     def __init__(
         self,

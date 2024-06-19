@@ -1,5 +1,6 @@
 from aws_cdk import (
     Stack,
+    NestedStack,
     aws_ec2 as ec2,
     aws_ecs as ecs,
     aws_iam as iam,
@@ -15,7 +16,7 @@ from aws_cdk import (
 
 from constructs import Construct
 
-class CollectorServiceStack(Stack):
+class CollectorServiceStack(NestedStack):
 
     def __init__(
         self,

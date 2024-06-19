@@ -3,6 +3,7 @@ from constructs import Construct
 from aws_cdk import (
     App, 
     Stack,
+    NestedStack,
     CfnOutput,
     Tags,
     aws_iam as iam,
@@ -20,7 +21,7 @@ from aws_cdk.aws_stepfunctions import (
     JsonPath
 )
 
-class GlueStack(Stack):
+class GlueStack(NestedStack):
 
     def __init__(self, scope: Construct, construct_id: str, kms_key,api_name: str,source_kinesis_stream,
                  s3_collector_destination, **kwargs) -> None:

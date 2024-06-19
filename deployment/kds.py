@@ -2,13 +2,13 @@ import random
 import string
 import aws_cdk as cdk
 from aws_cdk import (
-  Stack,
+  Stack,NestedStack,
   aws_kinesis
 )
 from constructs import Construct
 
 
-class KinesisDataStreamsStack(Stack):
+class KinesisDataStreamsStack(NestedStack):
 
   def __init__(self, scope: Construct, construct_id: str,kms_key,api_name: str, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
