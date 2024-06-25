@@ -18,6 +18,8 @@
     "glue_table_agg_raw": "aggregation_report_raw",
     "glue_table_agg_avro": "aggregation_report_avro",
 
+    "auto_start_glue_jobs": true,
+
     "collector_ecr_repo_name": "collector-api",
     "privacy_sandbox_aggregation_service_api": "<REPLACE WITH API GATEWAY URI FOR YOUR AGGREGATION SERVICE"
 }

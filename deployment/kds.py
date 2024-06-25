@@ -3,7 +3,7 @@ import string
 import aws_cdk as cdk
 from aws_cdk import (
   Stack,NestedStack,
-  aws_kinesis
+  aws_kinesis,RemovalPolicy
 )
 from constructs import Construct
 
@@ -24,10 +24,12 @@ class KinesisDataStreamsStack(NestedStack):
 
     self.kinesis_stream = aws_kinesis.Stream(self, "SourceKinesisStreams",
       retention_period=cdk.Duration.hours(int(self.kds_retention_hours)),
+      removal_policy = RemovalPolicy.DESTROY,
       encryption = aws_kinesis.StreamEncryption.KMS,
       encryption_key=kms_key,
       stream_mode=aws_kinesis.StreamMode.ON_DEMAND,
       stream_name=KINESIS_STREAM_NAME.value_as_string)
+
     
     cdk.CfnOutput(self, 'KinesisDataStreamsName',
       value=self.kinesis_stream.stream_name,

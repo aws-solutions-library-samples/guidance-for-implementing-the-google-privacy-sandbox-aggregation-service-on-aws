@@ -2,19 +2,25 @@
 
 ## Table of Content
 
-1. [Overview](#overview)
+- [Deploing Privacy Sandbox on AWS](#deploing-privacy-sandbox-on-aws)
+  - [Table of Content](#table-of-content)
+  - [Overview](#overview)
+    - [Architecture Overview](#architecture-overview)
     - [Cost](#cost)
-2. [Prerequisites](#prerequisites)
+  - [Prerequisites](#prerequisites)
     - [Operating System](#operating-system)
-3. [Deployment Steps](#deployment-steps)
-4. [Deployment Validation](#deployment-validation)
-5. [Running the Guidance](#running-the-guidance)
-6. [Next Steps](#next-steps)
-7. [Cleanup](#cleanup)
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
-9. [Revisions](#revisions)
-10. [Notices](#notices)
-11. [Authors](#authors)
+    - [Python Dependencies](#python-dependencies)
+    - [AWS CDK bootstrap](#aws-cdk-bootstrap)
+  - [Deployment Steps](#deployment-steps)
+  - [Deployment Validation](#deployment-validation)
+  - [Running the Guidance](#running-the-guidance)
+    - [Expected output](#expected-output)
+  - [Next Steps](#next-steps)
+  - [Cleanup](#cleanup)
+  - [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
+  - [Revisions](#revisions)
+  - [Notices](#notices)
+  - [Authors](#authors)
 
 ## Overview
 This solution demonstrates how to deploy the Privacy Sandbox Private Aggregation Service and supporting services for Privacy Sandbox report collection and processing on AWS. The guidance currently does not implement batching functionality required to process reports, but will be updated in the future to support this.
@@ -26,7 +32,6 @@ This solution demonstrates how to deploy the Privacy Sandbox Private Aggregation
 ### Cost
 
 _You are responsible for the cost of the AWS services used while running this Guidance. As of May 2024, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $2,599 per month for processing ( 30 million records each day )._
-
 
 
 ## Prerequisites
@@ -72,7 +77,7 @@ cdk bootstrap --profile <profile name>
 
 1. Clone this repository to your development desktop
 ```
-git clone **TODO GITHUB URL**
+git clone https://github.com/aws-solutions-library-samples/guidance-for-implementing-the-google-privacy-sandbox-aggregation-service-on-aws.git
 ```
 2. Use [envsetup.sh](./envsetup.sh) to setup virtual environment and install python dependencies
 
@@ -88,16 +93,7 @@ git clone **TODO GITHUB URL**
 
  ```
 
-5. Deploy the [CollectorBuild]('./deployment/collector_build.py') stack.
-```
-    cdk deploy CollectorBuild --profile <profile name>
-```
-
-6. Navigate to AWS CodeBuild in the console and locate the project created by the previous step. Start the build. Once the build has completed successfully proceed to the next step.
-
-7.  cdk deploy CollectorService --profile <profile name>
-
-8. Navigate to Glue ETL Jobs in the AWS Console and run the following Glue Jobs: job-aggregate-raw, job-aggregate-avro
+5.  cdk deploy --all --profile <profile name>
 
 
 ## Deployment Validation
