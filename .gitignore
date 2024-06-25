@@ -6,5 +6,3 @@ __pycache__
 bandit*.out
 cdk.out
 cdk.context.json
-env
-.env
