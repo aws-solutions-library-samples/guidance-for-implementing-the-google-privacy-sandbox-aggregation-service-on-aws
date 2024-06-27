@@ -3,24 +3,26 @@ from constructs import Construct
 from aws_cdk import (
     App, 
     Stack,
+    NestedStack,
     CfnOutput,
     Tags,
     aws_iam as iam,
     aws_s3 as s3,
     RemovalPolicy,
+    custom_resources as cr,
     aws_glue as glue,
     aws_kms as kms,
     aws_s3_deployment as s3_deploy
 )
 import aws_cdk.aws_glue_alpha as glue_alpha
-
+from cdk_nag import NagSuppressions
 import aws_cdk.aws_glue_alpha as glue_alpha
 
 from aws_cdk.aws_stepfunctions import (
     JsonPath
 )
 
-class GlueStack(Stack):
+class GlueStack(NestedStack):
 
     def __init__(self, scope: Construct, construct_id: str, kms_key,api_name: str,source_kinesis_stream,
                  s3_collector_destination, **kwargs) -> None:
@@ -35,6 +37,7 @@ class GlueStack(Stack):
         self.aggregate_avro_job_name = self.node.try_get_context("aggregate_avro_job_name")
         self.window_size= self.node.try_get_context("stream_batch_window_size") or "100 seconds"
         self.classification = self.node.try_get_context("classification")
+        self.auto_start_glue_jobs = self.node.try_get_context("start_glue_jobs") or True
         self.s3_collector_destination = s3_collector_destination
         
         self.add_buckets()
@@ -49,6 +52,13 @@ class GlueStack(Stack):
         #  avro data
         self.add_jobs(source_kinesis_stream,self.window_size,self.aggregate_avro_job_name,self.avro_job_script,self.glue_database_name,self.glue_table_agg_avro,kms_key)
         self.add_crawler(self.aggregate_avro_job_name,self.glue_database_name,self.glue_table_agg_avro,data_type="avro")
+        
+        # start up the glue jobs
+        if self.auto_start_glue_jobs:
+            self.start_job(self.aggregate_raw_job_name)
+            self.start_job(self.aggregate_avro_job_name)
+
+
 
   ##############################################################################
   # S3 Buckets
@@ -270,4 +280,34 @@ class GlueStack(Stack):
             recrawl_policy=glue.CfnCrawler.RecrawlPolicyProperty(
                 recrawl_behavior='CRAWL_EVERYTHING'
             )
+        )
+    def start_job(self,job_name):
+        
+      # start the collector build with a custom resource
+        trigger_job = cr.AwsSdkCall(service="Glue",
+                            action="StartJobRun",
+                            parameters={
+                                "JobName": job_name
+                            },
+                            physical_resource_id=cr.PhysicalResourceId.from_response('JobRunId'))
+
+        cr.AwsCustomResource(self, f"trigger-collector-job-{job_name}",
+                             policy=cr.AwsCustomResourcePolicy.from_sdk_calls(
+                                 resources=cr.AwsCustomResourcePolicy.ANY_RESOURCE),
+                             on_create=trigger_job,
+                             on_update=trigger_job)
+
+        # Suppress cdk-nag warnings for specific checks
+        NagSuppressions.add_stack_suppressions(
+            self,
+            [
+                {
+                    "id": "AwsSolutions-IAM4",
+                    "reason": "Default behaviour of CustomResource construct",
+                },
+                {
+                    'id': 'AwsSolutions-L1',
+                    'reason': 'Default behaviour of CustomResource construct',
+                },
+            ],
         )

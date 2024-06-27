@@ -1,10 +1,10 @@
 from aws_cdk import (
-  Stack,
+  Stack,NestedStack,
   aws_kms as kms,
 )
 from constructs import Construct
 
-class KMSKeyStack(Stack):
+class KMSKeyStack(NestedStack):
 
   def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
     super().__init__(scope, construct_id, **kwargs)
