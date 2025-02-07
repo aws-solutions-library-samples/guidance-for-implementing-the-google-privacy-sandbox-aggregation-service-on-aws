@@ -1,8 +1,8 @@
-# Deploing Privacy Sandbox on AWS
+# Deploying Privacy Sandbox on AWS
 
 ## Table of Content
 
-- [Deploing Privacy Sandbox on AWS](#deploing-privacy-sandbox-on-aws)
+- [Deploying Privacy Sandbox on AWS](#deploying-privacy-sandbox-on-aws)
   - [Table of Content](#table-of-content)
   - [Overview](#overview)
     - [Architecture Overview](#architecture-overview)
